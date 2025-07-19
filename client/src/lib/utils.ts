@@ -58,7 +58,7 @@ export const withToast = async <T>(
 
 export const createNewUserInDatabase = async (
   user: any,
-  idToken: any,
+  idToken:any,
   userRole: string,
   fetchWithBQ: any
 ) => {

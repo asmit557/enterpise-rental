@@ -9,13 +9,14 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
+const authMiddleware_1 = require("./middleware/authMiddleware");
 // import { authMiddleware } from "./middleware/authMiddleware";
 // /* ROUTE IMPORT */
-// import tenantRoutes from "./routes/tenantRoutes";
-// import managerRoutes from "./routes/managerRoutes";
-// import propertyRoutes from "./routes/propertyRoutes";
-// import leaseRoutes from "./routes/leaseRoutes";
-// import applicationRoutes from "./routes/applicationRoutes";
+const tenantRoutes_1 = __importDefault(require("./routes/tenantRoutes"));
+const managerRoutes_1 = __importDefault(require("./routes/managerRoutes"));
+const propertyRoutes_1 = __importDefault(require("./routes/propertyRoutes"));
+const leaseRoutes_1 = __importDefault(require("./routes/leaseRoutes"));
+const applicationRoutes_1 = __importDefault(require("./routes/applicationRoutes"));
 /* CONFIGURATIONS */
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -30,13 +31,13 @@ app.use((0, cors_1.default)());
 app.get("/", (req, res) => {
     res.send("This is home route");
 });
-// app.use("/applications", applicationRoutes);
-// app.use("/properties", propertyRoutes);
-// app.use("/leases", leaseRoutes);
-// app.use("/tenants", authMiddleware(["tenant"]), tenantRoutes);
-// app.use("/managers", authMiddleware(["manager"]), managerRoutes);
+app.use("/applications", applicationRoutes_1.default);
+app.use("/properties", propertyRoutes_1.default);
+app.use("/leases", leaseRoutes_1.default);
+app.use("/tenants", (0, authMiddleware_1.authMiddleware)(["tenant"]), tenantRoutes_1.default);
+app.use("/managers", (0, authMiddleware_1.authMiddleware)(["manager"]), managerRoutes_1.default);
 /* SERVER */
 const port = Number(process.env.PORT) || 3002;
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
     console.log(`Server running on port ${port}`);
 });
