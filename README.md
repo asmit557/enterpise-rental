@@ -63,16 +63,16 @@ A robust, full-stack real estate management web application built with modern te
 
 ## 📦 Project Structure
 
-/client 
-├── components
-├── pages
-├── lib
-├── hooks
+/client <br>
+├── components<br>
+├── pages<br>
+├── lib<br>
+├── hooks<br>
 └── ...
 /server
-├── src
-├── prisma
-├── middleware
+├── src<br>
+├── prisma<br>
+├── middleware<br>
 └── ...
 
 
@@ -106,16 +106,16 @@ A robust, full-stack real estate management web application built with modern te
 - Mapbox Access Token
 - `.env` files for both client and server
 
-git clone https://github.com/asmit557/enterpise-rental
+git clone https://github.com/asmit557/enterpise-rental<br>
 cd enterpise-rental
 
 # Install and start frontend
-cd client
-npm install
+cd client<br>
+npm install<br>
 npm run dev
 
 # Install backend
-cd ../server
+cd ../server<br>
 npm install
 
 # Start server
@@ -192,5 +192,5 @@ This project would not have been possible without the support and tools provided
 We are grateful for the contributions, documentation, and open access provided by these platforms and communities.
 
 ## 👨‍💻 Author
-Built with 💻 by Asmit Verma
+Built with 💻 by Asmit Verma<br>
 📫 Reach out: asmitv595@gmail.com
