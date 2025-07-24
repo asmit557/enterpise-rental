@@ -1,4 +1,4 @@
-# 🏘️ Enterprise Property Management Platform
+# 🏘️ Dwello - Enterprise Property Management Platform
 
 A robust, full-stack real estate management web application built with modern technologies like **Next.js**, **TypeScript**, **Tailwind CSS**, **Shadcn UI**, **Express.js**, **Prisma ORM**, and **AWS Services**. It provides scalable features like advanced geolocation-based search, secure role-based authentication, cloud media storage, and high-performance APIs.
 
@@ -106,41 +106,90 @@ A robust, full-stack real estate management web application built with modern te
 - Mapbox Access Token
 - `.env` files for both client and server
 
-### Clone and Run
-
-```bash
-# Clone the repository
-git clone https://github.com/asmit557/enterpise-rental.git
+git clone https://github.com/asmit557/enterpise-rental
 cd enterpise-rental
 
-# Install client dependencies
+# Install and start frontend
 cd client
 npm install
+npm run dev
 
-# Install server dependencies
+# Install backend
 cd ../server
 npm install
 
-# Run development servers
-# In /client
+# Start server
 npm run dev
 
-# In /server
-npm run dev
 
-## 🧠 Future Improvements
+# 🔧 Future Improvements
 
-✅ Add unit & integration tests (Jest + React Testing Library)
-✅ Implement notification system
-✅ Add user analytics dashboard
-✅ GraphQL support
+While the current version of the application provides a robust foundation for a full-stack real estate rental platform, the following features and enhancements are planned for future iterations:
 
-## 🙌 Acknowledgements
-Mapbox
-AWS Cognito
-Shadcn UI
-PostGIS
-Nominatim
+- **🧠 AI-Powered Recommendations**  
+  Integrate machine learning models to suggest properties based on user behavior, preferences, and previous interactions.
+
+- **📍 Drawing and Map Editing Tools**  
+  Enable users to draw custom boundaries or shapes on maps to search within specific areas or neighborhoods.
+
+- **📊 Admin Dashboard Analytics**  
+  Implement comprehensive data visualization dashboards for property trends, user activity, and revenue insights.
+
+- **🌐 Multilingual Support**  
+  Provide localization and translation support for international users to expand the platform's accessibility.
+
+- **🔐 Multi-Tier User Roles**  
+  Introduce advanced user roles (agent, buyer, broker, admin) with granular permission controls and dynamic dashboards.
+
+- **📱 Mobile App Support**  
+  Extend functionality through a native mobile application built with React Native or Flutter for cross-platform deployment.
+
+- **💬 Real-Time Chat**  
+  Integrate Socket.IO or WebSockets for real-time messaging between property owners and potential tenants.
+
+- **📅 Integrated Booking System**  
+  Add scheduling features for property visits with calendar sync (Google Calendar, Outlook, etc.).
+
+- **🧾 Payment Gateway Integration**  
+  Implement secure online rent payments or deposit booking via Stripe or Razorpay for end-to-end transaction handling.
+
+- **🧑‍💻 Developer CLI Tools**  
+  Develop internal CLI utilities to simplify database seeding, user role creation, and map tile uploads during development.
+
+These improvements aim to enhance user experience, increase platform scalability, and prepare the project for real-world production deployment.
+
+
+# 🙌 Acknowledgements
+
+This project would not have been possible without the support and tools provided by the following technologies and services:
+
+- **[Mapbox](https://www.mapbox.com/):**  
+  For providing high-quality, interactive geospatial maps used for property location visualization and clustering.
+
+- **[AWS Cognito](https://aws.amazon.com/cognito/):**  
+  For seamless and secure user authentication and authorization, including multi-role access control.
+
+- **[Shadcn UI](https://ui.shadcn.com/):**  
+  For beautifully designed and easily customizable React UI components that enabled a modern and consistent interface.
+
+- **[PostGIS](https://postgis.net/):**  
+  For powerful geospatial capabilities built on top of PostgreSQL, enabling spatial queries and location-based filtering.
+
+- **[AWS Amplify](https://aws.amazon.com/amplify/):**  
+  For hosting the frontend application with CI/CD support, rapid deployments, and custom domain integration.
+
+- **[AWS EC2](https://aws.amazon.com/ec2/):**  
+  For providing the backend hosting infrastructure with scalability and control over server configurations.
+
+- **[Nominatim API](https://nominatim.org/):**  
+  For enabling reverse geocoding and address lookups that enhance user experience during property listing.
+
+- **[Open Source Community](https://github.com/):**  
+  For the libraries, tools, documentation, and support that accelerate development and problem-solving.
+
+---
+
+We are grateful for the contributions, documentation, and open access provided by these platforms and communities.
 
 ## 👨‍💻 Author
 Built with 💻 by Asmit Verma
