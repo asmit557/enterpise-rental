@@ -6,7 +6,7 @@ A robust, full-stack real estate management web application built with modern te
 
 ## 🚀 Live Demo
 
-🌐 [View Deployed App](https://your-deployment-url.com)
+🌐 [View Deployed App](https://main.d362jx63lfj2er.amplifyapp.com/)
 
 ---
 
@@ -63,7 +63,7 @@ A robust, full-stack real estate management web application built with modern te
 
 ## 📦 Project Structure
 
-/client
+/client 
 ├── components
 ├── pages
 ├── lib
@@ -128,31 +128,20 @@ npm run dev
 # In /server
 npm run dev
 
-
-🧪 Testing & Linting
-
-# Client lint
-cd client
-npm run lint
-
-# Server test (if applicable)
-cd ../server
-# Add your test command here if set up
-
-🧠 Future Improvements
+## 🧠 Future Improvements
 
 ✅ Add unit & integration tests (Jest + React Testing Library)
 ✅ Implement notification system
 ✅ Add user analytics dashboard
 ✅ GraphQL support
 
-🙌 Acknowledgements
+## 🙌 Acknowledgements
 Mapbox
 AWS Cognito
 Shadcn UI
 PostGIS
 Nominatim
 
-👨‍💻 Author
+## 👨‍💻 Author
 Built with 💻 by Asmit Verma
 📫 Reach out: asmitv595@gmail.com
