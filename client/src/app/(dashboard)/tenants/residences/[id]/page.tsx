@@ -252,7 +252,7 @@ const Residence = () => {
   );
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container px-4 md:px-6 lg:px-8 mt-7">
       <div className="w-full mx-auto">
         <div className="md:flex gap-10">
           {currentLease && (
