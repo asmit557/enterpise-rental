@@ -29,9 +29,9 @@ const components = {
     return (
       <View className="mt-4 mb-7">
         <Heading level={3} className="!text-2xl !font-bold">
-          RENT
+          Dwe
           <span className="text-secondary-500 font-light hover:!text-primary-300">
-            IFUL
+            llo
           </span>
         </Heading>
         <p className="text-muted-foreground mt-2">
@@ -155,7 +155,6 @@ const Auth = ({ children }: { children: React.ReactNode }) => {
       router.push("/"); // Redirect signed-in users from signin/signup
     }
     // if (!user && isDashboardPage) {
-    //    console.log("akugf");
     //   router.push("/signin"); // Redirect unsigned users from dashboard
     // }
   }, [user, isAuthPage, isDashboardPage, router]);

@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createProperty = exports.getProperty = exports.getProperties = void 0;
+exports.getLeasesByPropertyId = exports.createProperty = exports.getProperty = exports.getProperties = void 0;
 const client_1 = require("@prisma/client");
 const wkt_1 = require("@terraformer/wkt");
 const client_s3_1 = require("@aws-sdk/client-s3");
@@ -32,10 +32,17 @@ const axios_1 = __importDefault(require("axios"));
 const prisma = new client_1.PrismaClient();
 const s3Client = new client_s3_1.S3Client({
     region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
 });
 const getProperties = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { favoriteIds, priceMin, priceMax, beds, baths, propertyType, squareFeetMin, squareFeetMax, amenities, availableFrom, latitude, longitude, } = req.query;
+        console.log("enter 1");
+        console.log("Input coordinates:", latitude, longitude);
+        console.log(availableFrom);
         let whereConditions = [];
         if (favoriteIds) {
             const favoriteIdsArray = favoriteIds.split(",").map(Number);
@@ -64,22 +71,24 @@ const getProperties = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
         if (amenities && amenities !== "any") {
             const amenitiesArray = amenities.split(",");
-            whereConditions.push(client_1.Prisma.sql `p.amenities @> ${amenitiesArray}`);
+            const amenityList = amenitiesArray.map((a) => `'${a}'`).join(",");
+            whereConditions.push(client_1.Prisma.sql `p.amenities @> ${client_1.Prisma.raw(`ARRAY[${amenityList}]::"Amenity"[]`)}`);
         }
-        if (availableFrom && availableFrom !== "any") {
-            const availableFromDate = typeof availableFrom === "string" ? availableFrom : null;
-            if (availableFromDate) {
-                const date = new Date(availableFromDate);
-                if (!isNaN(date.getTime())) {
-                    whereConditions.push(client_1.Prisma.sql `EXISTS (
-              SELECT 1 FROM "Lease" l 
-              WHERE l."propertyId" = p.id 
-              AND l."startDate" <= ${date.toISOString()}
-            )`);
-                }
-            }
+        if (availableFrom &&
+            availableFrom !== "any" &&
+            typeof availableFrom === "string" &&
+            !isNaN(Date.parse(availableFrom))) {
+            console.log("lasiugl");
+            const date = new Date(availableFrom);
+            whereConditions.push(client_1.Prisma.sql `EXISTS (
+    SELECT 1 FROM "Lease" lease 
+    WHERE lease."propertyId" = p.id 
+    AND lease."startDate" <= CAST(${date.toISOString()} AS timestamp)
+  )`);
         }
+        console.log("done");
         if (latitude && longitude) {
+            console.log("enter");
             const lat = parseFloat(latitude);
             const lng = parseFloat(longitude);
             const radiusInKilometers = 1000;
@@ -90,6 +99,7 @@ const getProperties = (req, res) => __awaiter(void 0, void 0, void 0, function* 
           ${degrees}
         )`);
         }
+        console.log("done 2");
         const completeQuery = client_1.Prisma.sql `
       SELECT 
         p.*,
@@ -111,7 +121,9 @@ const getProperties = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             ? client_1.Prisma.sql `WHERE ${client_1.Prisma.join(whereConditions, " AND ")}`
             : client_1.Prisma.empty}
     `;
+        console.log("done 3");
         const properties = yield prisma.$queryRaw(completeQuery);
+        console.log(properties);
         res.json(properties);
     }
     catch (error) {
@@ -151,10 +163,11 @@ const getProperty = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.getProperty = getProperty;
 const createProperty = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
+    var _a, _b;
     try {
         const files = req.files;
-        const _e = req.body, { address, city, state, country, postalCode, managerCognitoId } = _e, propertyData = __rest(_e, ["address", "city", "state", "country", "postalCode", "managerCognitoId"]);
+        const _c = req.body, { address, city, state, country, postalCode, managerCognitoId } = _c, propertyData = __rest(_c, ["address", "city", "state", "country", "postalCode", "managerCognitoId"]);
+        // Upload images to S3
         const photoUrls = yield Promise.all(files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
             const uploadParams = {
                 Bucket: process.env.S3_BUCKET_NAME,
@@ -168,38 +181,36 @@ const createProperty = (req, res) => __awaiter(void 0, void 0, void 0, function*
             }).done();
             return uploadResult.Location;
         })));
+        // Get coordinates from OpenStreetMap
+        const fullAddress = `${address}, ${city}, ${state}, ${postalCode}, ${country}`;
         const geocodingUrl = `https://nominatim.openstreetmap.org/search?${new URLSearchParams({
-            street: address,
-            city,
-            country,
-            postalcode: postalCode,
+            q: fullAddress,
             format: "json",
             limit: "1",
         }).toString()}`;
         const geocodingResponse = yield axios_1.default.get(geocodingUrl, {
             headers: {
-                "User-Agent": "RealEstateApp (justsomedummyemail@gmail.com",
+                "User-Agent": "RealEstateApp (justsomedummyemail@gmail.com)",
             },
         });
         const [longitude, latitude] = ((_a = geocodingResponse.data[0]) === null || _a === void 0 ? void 0 : _a.lon) && ((_b = geocodingResponse.data[0]) === null || _b === void 0 ? void 0 : _b.lat)
             ? [
-                parseFloat((_c = geocodingResponse.data[0]) === null || _c === void 0 ? void 0 : _c.lon),
-                parseFloat((_d = geocodingResponse.data[0]) === null || _d === void 0 ? void 0 : _d.lat),
+                parseFloat(geocodingResponse.data[0].lon),
+                parseFloat(geocodingResponse.data[0].lat),
             ]
             : [0, 0];
-        // create location
+        console.log('Geocoded coords:', longitude, latitude);
+        // ✅ Step 1: Insert location using raw SQL to set geometry
         const [location] = yield prisma.$queryRaw `
       INSERT INTO "Location" (address, city, state, country, "postalCode", coordinates)
-      VALUES (${address}, ${city}, ${state}, ${country}, ${postalCode}, ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326))
+      VALUES (${address}, ${city}, ${state}, ${country}, ${postalCode},
+        ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326))
       RETURNING id, address, city, state, country, "postalCode", ST_AsText(coordinates) as coordinates;
     `;
-        // create property
+        // ✅ Step 2: Create the property
         const newProperty = yield prisma.property.create({
-            data: Object.assign(Object.assign({}, propertyData), { photoUrls, locationId: location.id, managerCognitoId, amenities: typeof propertyData.amenities === "string"
-                    ? propertyData.amenities.split(",")
-                    : [], highlights: typeof propertyData.highlights === "string"
-                    ? propertyData.highlights.split(",")
-                    : [], isPetsAllowed: propertyData.isPetsAllowed === "true", isParkingIncluded: propertyData.isParkingIncluded === "true", pricePerMonth: parseFloat(propertyData.pricePerMonth), securityDeposit: parseFloat(propertyData.securityDeposit), applicationFee: parseFloat(propertyData.applicationFee), beds: parseInt(propertyData.beds), baths: parseFloat(propertyData.baths), squareFeet: parseInt(propertyData.squareFeet) }),
+            data: Object.assign(Object.assign({}, propertyData), { locationId: location.id, photoUrls,
+                managerCognitoId, amenities: typeof propertyData.amenities === "string" ? propertyData.amenities.split(",") : [], highlights: typeof propertyData.highlights === "string" ? propertyData.highlights.split(",") : [], isPetsAllowed: propertyData.isPetsAllowed === "true", isParkingIncluded: propertyData.isParkingIncluded === "true", pricePerMonth: parseFloat(propertyData.pricePerMonth), securityDeposit: parseFloat(propertyData.securityDeposit), applicationFee: parseFloat(propertyData.applicationFee), beds: parseInt(propertyData.beds), baths: parseFloat(propertyData.baths), squareFeet: parseInt(propertyData.squareFeet) }),
             include: {
                 location: true,
                 manager: true,
@@ -208,9 +219,33 @@ const createProperty = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(201).json(newProperty);
     }
     catch (err) {
-        res
-            .status(500)
-            .json({ message: `Error creating property: ${err.message}` });
+        console.error("Error in createProperty:", err);
+        res.status(500).json({ message: `Error creating property: ${err.message}` });
     }
 });
 exports.createProperty = createProperty;
+const getLeasesByPropertyId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const propertyId = parseInt(req.params.id);
+        if (isNaN(propertyId)) {
+            res.status(400).json({ message: "Invalid propertyId in params." });
+        }
+        const leases = yield prisma.lease.findMany({
+            where: {
+                propertyId,
+            },
+            include: {
+                tenant: true, // include tenant details
+                application: true, // include related application (optional)
+                payments: true, // include all payment records
+                property: true, // include property info (optional)
+            },
+        });
+        res.status(200).json(leases);
+    }
+    catch (error) {
+        console.error("Error fetching leases:", error);
+        res.status(500).json({ message: "Server error while fetching leases." });
+    }
+});
+exports.getLeasesByPropertyId = getLeasesByPropertyId;

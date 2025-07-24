@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { string } from "zod";
 
 export interface FiltersState {
   location: string;

@@ -64,7 +64,7 @@ const NewProperty = () => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container px-4 md:px-6 lg:px-8 mt-4">
       <Header
         title="Add New Property"
         subtitle="Create a new property listing with detailed information"
@@ -170,7 +170,7 @@ const NewProperty = () => {
                 <CustomFormField
                   name="amenities"
                   label="Amenities"
-                  type="select"
+                  type="multi-input"
                   options={Object.keys(AmenityEnum).map((amenity) => ({
                     value: amenity,
                     label: amenity,

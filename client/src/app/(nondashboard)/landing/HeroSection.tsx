@@ -32,12 +32,12 @@ const HeroSection = () => {
         dispatch(
           setFilters({
             location: trimmedQuery,
-            coordinates: [lat, lng],
+            coordinates: [lng, lat],
           })
         );
         const params = new URLSearchParams({
           location: trimmedQuery,
-          lat: lat.toString(),
+          lat: lat,
           lng: lng,
         });
         router.push(`/search?${params.toString()}`);
@@ -50,19 +50,19 @@ const HeroSection = () => {
   return (
     <div className="relative h-screen">
       <Image
-        src="/landing-splash.jpg"
-        alt="Rentiful Rental Platform Hero Section"
-        fill
-        className="object-cover object-center"
-        priority
-      />
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="absolute top-1/3 transform -translate-x-1/2 -translate-y-1/2 text-center w-full"
-      >
+  src="/landing-splash.jpg" // or a fallback image URL
+  alt="Rentiful Rental Platform Hero Section"
+  fill
+  priority
+/>
+<div className="absolute inset-0" />
+
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full"
+>
         <div className="max-w-4xl mx-auto px-16 sm:px-12">
           <h1 className="text-5xl font-bold text-white mb-4">
             Start your journey to finding the perfect place to call home

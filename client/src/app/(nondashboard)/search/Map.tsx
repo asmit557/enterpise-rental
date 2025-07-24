@@ -11,11 +11,13 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string;
 const Map = () => {
   const mapContainerRef = useRef(null);
   const filters = useAppSelector((state) => state.global.filters);
+  console.log(filters)
   const {
     data: properties,
     isLoading,
     isError,
   } = useGetPropertiesQuery(filters);
+  console.log(properties);
 
   useEffect(() => {
     if (isLoading || isError || !properties) return;
@@ -34,10 +36,10 @@ const Map = () => {
       if (path) path.setAttribute("fill", "#000000");
     });
 
-    const resizeMap = () => {
-      if (map) setTimeout(() => map.resize(), 700);
-    };
-    resizeMap();
+    // const resizeMap = () => {
+    //   if (map) setTimeout(() => map.resize(), 700);
+    // };
+    // resizeMap();
 
     return () => map.remove();
   }, [isLoading, isError, properties, filters.coordinates]);

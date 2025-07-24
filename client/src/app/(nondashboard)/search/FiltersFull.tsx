@@ -1,7 +1,7 @@
 import { FiltersState, initialState, setFilters } from "@/state";
 import { useAppSelector } from "@/state/redux";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { debounce } from "lodash";
 import { cleanParams, cn, formatEnumString } from "@/lib/utils";
@@ -24,7 +24,6 @@ const FiltersFull = () => {
   const router = useRouter();
   const pathname = usePathname();
   const filters = useAppSelector((state) => state.global.filters);
-  const [localFilters, setLocalFilters] = useState(initialState.filters);
   const isFiltersFullOpen = useAppSelector(
     (state) => state.global.isFiltersFullOpen
   );
@@ -44,30 +43,28 @@ const FiltersFull = () => {
   });
 
   const handleSubmit = () => {
-    dispatch(setFilters(localFilters));
-    updateURL(localFilters);
+    dispatch(setFilters(filters));
+    updateURL(filters);
   };
 
   const handleReset = () => {
-    setLocalFilters(initialState.filters);
     dispatch(setFilters(initialState.filters));
     updateURL(initialState.filters);
   };
 
   const handleAmenityChange = (amenity: AmenityEnum) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-      amenities: prev.amenities.includes(amenity)
-        ? prev.amenities.filter((a) => a !== amenity)
-        : [...prev.amenities, amenity],
-    }));
+    const updatedAmenities = filters.amenities.includes(amenity)
+      ? filters.amenities.filter((a) => a !== amenity)
+      : [...filters.amenities, amenity];
+
+    dispatch(setFilters({ ...filters, amenities: updatedAmenities }));
   };
 
   const handleLocationSearch = async () => {
     try {
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          localFilters.location
+          filters.location
         )}.json?access_token=${
           process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
         }&fuzzyMatch=true`
@@ -75,10 +72,7 @@ const FiltersFull = () => {
       const data = await response.json();
       if (data.features && data.features.length > 0) {
         const [lng, lat] = data.features[0].center;
-        setLocalFilters((prev) => ({
-          ...prev,
-          coordinates: [lng, lat],
-        }));
+        dispatch(setFilters({ ...filters, coordinates: [lng, lat] }));
       }
     } catch (err) {
       console.error("Error search location:", err);
@@ -98,10 +92,7 @@ const FiltersFull = () => {
               placeholder="Enter location"
               value={filters.location}
               onChange={(e) =>
-                setLocalFilters((prev) => ({
-                  ...prev,
-                  location: e.target.value,
-                }))
+                dispatch(setFilters({ ...filters, location: e.target.value }))
               }
               className="rounded-l-xl rounded-r-none border-r-0"
             />
@@ -123,15 +114,14 @@ const FiltersFull = () => {
                 key={type}
                 className={cn(
                   "flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer",
-                  localFilters.propertyType === type
+                  filters.propertyType === type
                     ? "border-black"
                     : "border-gray-200"
                 )}
                 onClick={() =>
-                  setLocalFilters((prev) => ({
-                    ...prev,
-                    propertyType: type as PropertyTypeEnum,
-                  }))
+                  dispatch(
+                    setFilters({ ...filters, propertyType: type as PropertyTypeEnum })
+                  )
                 }
               >
                 <Icon className="w-6 h-6 mb-2" />
@@ -148,20 +138,15 @@ const FiltersFull = () => {
             min={0}
             max={10000}
             step={100}
-            value={[
-              localFilters.priceRange[0] ?? 0,
-              localFilters.priceRange[1] ?? 10000,
-            ]}
+            value={[ filters.priceRange[0] ?? 0,
+              filters.priceRange[1] ?? 10000]}
             onValueChange={(value: any) =>
-              setLocalFilters((prev) => ({
-                ...prev,
-                priceRange: value as [number, number],
-              }))
+              dispatch(setFilters({ ...filters, priceRange: value }))
             }
           />
           <div className="flex justify-between mt-2">
-            <span>${localFilters.priceRange[0] ?? 0}</span>
-            <span>${localFilters.priceRange[1] ?? 10000}</span>
+            <span>${filters.priceRange[0] ?? 0}</span>
+            <span>${filters.priceRange[1] ?? 10000}</span>
           </div>
         </div>
 
@@ -170,9 +155,9 @@ const FiltersFull = () => {
           <div className="flex-1">
             <h4 className="font-bold mb-2">Beds</h4>
             <Select
-              value={localFilters.beds || "any"}
+              value={filters.beds || "any"}
               onValueChange={(value) =>
-                setLocalFilters((prev) => ({ ...prev, beds: value }))
+                dispatch(setFilters({ ...filters, beds: value }))
               }
             >
               <SelectTrigger className="w-full rounded-xl">
@@ -190,9 +175,9 @@ const FiltersFull = () => {
           <div className="flex-1">
             <h4 className="font-bold mb-2">Baths</h4>
             <Select
-              value={localFilters.baths || "any"}
+              value={filters.baths || "any"}
               onValueChange={(value) =>
-                setLocalFilters((prev) => ({ ...prev, baths: value }))
+                dispatch(setFilters({ ...filters, baths: value }))
               }
             >
               <SelectTrigger className="w-full rounded-xl">
@@ -215,21 +200,16 @@ const FiltersFull = () => {
             min={0}
             max={5000}
             step={100}
-            value={[
-              localFilters.squareFeet[0] ?? 0,
-              localFilters.squareFeet[1] ?? 5000,
-            ]}
-            onValueChange={(value) =>
-              setLocalFilters((prev) => ({
-                ...prev,
-                squareFeet: value as [number, number],
-              }))
+            value={[ filters.squareFeet[0] ?? 0,
+              filters.squareFeet[1] ?? 5000,]}
+            onValueChange={(value: any) =>
+              dispatch(setFilters({ ...filters, squareFeet: value }))
             }
             className="[&>.bar]:bg-primary-700"
           />
           <div className="flex justify-between mt-2">
-            <span>{localFilters.squareFeet[0] ?? 0} sq ft</span>
-            <span>{localFilters.squareFeet[1] ?? 5000} sq ft</span>
+            <span>{filters.squareFeet[0] ?? 0} sq ft</span>
+            <span>{filters.squareFeet[1] ?? 5000} sq ft</span>
           </div>
         </div>
 
@@ -242,7 +222,7 @@ const FiltersFull = () => {
                 key={amenity}
                 className={cn(
                   "flex items-center space-x-2 p-2 border rounded-lg hover:cursor-pointer",
-                  localFilters.amenities.includes(amenity as AmenityEnum)
+                  filters.amenities.includes(amenity as AmenityEnum)
                     ? "border-black"
                     : "border-gray-200"
                 )}
@@ -262,29 +242,21 @@ const FiltersFull = () => {
           <h4 className="font-bold mb-2">Available From</h4>
           <Input
             type="date"
-            value={
-              localFilters.availableFrom !== "any"
-                ? localFilters.availableFrom
-                : ""
-            }
+            value={filters.availableFrom !== "any" ? filters.availableFrom : ""}
             onChange={(e) =>
-              setLocalFilters((prev) => ({
-                ...prev,
-                availableFrom: e.target.value ? e.target.value : "any",
-              }))
+              dispatch(
+                setFilters({
+                  ...filters,
+                  availableFrom: e.target.value || "any",
+                })
+              )
             }
             className="rounded-xl"
           />
         </div>
 
         {/* Apply and Reset buttons */}
-        <div className="flex gap-4 mt-6">
-          <Button
-            onClick={handleSubmit}
-            className="flex-1 bg-primary-700 text-white rounded-xl"
-          >
-            APPLY
-          </Button>
+        <div className="flex justify-center">
           <Button
             onClick={handleReset}
             variant="outline"

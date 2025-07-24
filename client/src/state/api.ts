@@ -81,6 +81,7 @@ export const api = createApi({
       Partial<FiltersState> & { favoriteIds?: number[] }
     >({
       query: (filters) => {
+        console.log(filters)
         const params = cleanParams({
           location: filters.location,
           priceMin: filters.priceRange?.[0],
@@ -90,12 +91,15 @@ export const api = createApi({
           propertyType: filters.propertyType,
           squareFeetMin: filters.squareFeet?.[0],
           squareFeetMax: filters.squareFeet?.[1],
-          amenities: filters.amenities?.join(","),
+          amenities: Array.isArray(filters.amenities)
+  ? filters.amenities.join(",")
+  : filters.amenities,
           availableFrom: filters.availableFrom,
           favoriteIds: filters.favoriteIds?.join(","),
           latitude: filters.coordinates?.[1],
           longitude: filters.coordinates?.[0],
         });
+        console.log(params);
 
         return { url: "properties", params };
       },
@@ -106,11 +110,11 @@ export const api = createApi({
               { type: "Properties", id: "LIST" },
             ]
           : [{ type: "Properties", id: "LIST" }],
-      async onQueryStarted(_, { queryFulfilled }) {
-        await withToast(queryFulfilled, {
-          error: "Failed to fetch properties.",
-        });
-      },
+      // async onQueryStarted(_, { queryFulfilled }) {
+      //   await withToast(queryFulfilled, {
+      //     error: "Failed to fetch properties.",
+      //   });
+      
     }),
 
     getProperty: build.query<Property, number>({

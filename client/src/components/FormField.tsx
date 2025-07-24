@@ -217,7 +217,7 @@ interface MultiInputFieldProps {
   inputClassName?: string;
 }
 
-const MultiInputField: React.FC<MultiInputFieldProps> = ({
+export const MultiInputField: React.FC<MultiInputFieldProps> = ({
   name,
   control,
   placeholder,

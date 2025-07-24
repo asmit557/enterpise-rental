@@ -13,4 +13,5 @@ const router = express_1.default.Router();
 router.get("/", propertyControllers_1.getProperties);
 router.get("/:id", propertyControllers_1.getProperty);
 router.post("/", (0, authMiddleware_1.authMiddleware)(["manager"]), upload.array("photos"), propertyControllers_1.createProperty);
+router.get("/:id/leases", (0, authMiddleware_1.authMiddleware)(["manager"]), propertyControllers_1.getLeasesByPropertyId);
 exports.default = router;
